@@ -11,7 +11,7 @@ from torch.nn.parallel import DataParallel
 
 import time
 import os.path as osp
-from tensorboardX import SummaryWriter
+#from tensorboardX import SummaryWriter
 import numpy as np
 import argparse
 
@@ -40,7 +40,7 @@ class Config(object):
     parser.add_argument('-r', '--run', type=int, default=1)
     parser.add_argument('--set_seed', type=str2bool, default=False)
     parser.add_argument('--dataset', type=str, default='market1501',
-                        choices=['market1501', 'cuhk03', 'duke', 'combined'])
+                        choices=['market1501', 'cuhk03', 'duke', 'rap2', 'combined'])
     parser.add_argument('--trainset_part', type=str, default='trainval',
                         choices=['trainval', 'train'])
 
@@ -470,7 +470,7 @@ def main():
       mAP, Rank1 = validate()
 
     # Log to TensorBoard
-
+    """
     if cfg.log_to_file:
       if writer is None:
         writer = SummaryWriter(log_dir=osp.join(cfg.exp_dir, 'tensorboard'))
@@ -483,7 +483,7 @@ def main():
         'loss',
         dict(loss=loss_meter.avg, ),
         ep)
-
+    """
     # save ckpt
     if cfg.log_to_file:
       save_ckpt(modules_optims, ep + 1, 0, cfg.ckpt_file)

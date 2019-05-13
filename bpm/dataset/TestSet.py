@@ -10,7 +10,7 @@ from .Dataset import Dataset
 
 from ..utils.utils import measure_time
 from ..utils.re_ranking import re_ranking
-from ..utils.metric import cmc, mean_ap
+from ..utils.metric import cmc, mean_ap, evaluate_reid_ap_cmc
 from ..utils.dataset_utils import parse_im_name
 from ..utils.distance import normalize
 from ..utils.distance import compute_dist
@@ -175,6 +175,40 @@ class TestSet(Dataset):
         topk=10)
       return mAP, cmc_scores
 
+    # Compute score with RAP2
+    def compute_score_rap(
+        dist_mat,
+        query_ids=ids[q_inds],
+        gallery_ids=ids[g_inds],
+        query_cams=cams[q_inds],
+        gallery_cams=cams[g_inds],
+        seperate_cam=False):
+      m, n = dist_mat.shape
+      # Sort and find correct matches
+      indices = np.argsort(dist_mat, axis=1)
+      res_ids = gallery_ids[indices]
+      res_cams = gallery_cams[indices]
+      # Compute AP
+      ap_list = []
+      cmc_list = []
+      for i in range(res_ids.shape[0]):
+        query_id = query_ids[i]
+        query_cam= query_cams[i]
+        res_ids_line = res_ids[i,:]
+        res_ids_line = res_ids_line.reshape((1, res_ids.shape[1]))
+        res_cams_line = res_cams[i,:]
+        res_cams_line = res_cams_line.reshape((1, res_ids.shape[1]))
+        ap, cmc = evaluate_reid_ap_cmc(query_id, query_cam, res_ids_line, \
+            res_cams_line)
+        ap_list.append(ap)
+        cmc_list.append(cmc)
+      ap_np = np.asarray(ap_list)
+      cmc_np = np.vstack(cmc_list)
+      cmc_scores_total = np.mean(cmc_np, axis=0)
+      mAP = np.mean(ap_np)
+      cmc_scores = cmc_scores_total[[0,4,9]]
+      return mAP, cmc_scores
+
     def print_scores(mAP, cmc_scores):
       print('[mAP: {:5.2%}], [cmc1: {:5.2%}], [cmc5: {:5.2%}], [cmc10: {:5.2%}]'
             .format(mAP, *cmc_scores[[0, 4, 9]]))
@@ -189,6 +223,7 @@ class TestSet(Dataset):
 
     with measure_time('Computing scores...', verbose=verbose):
       mAP, cmc_scores = compute_score(q_g_dist)
+      #compute_score_rap(q_g_dist)
 
     print('{:<30}'.format('Single Query:'), end='')
     print_scores(mAP, cmc_scores)
