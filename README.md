@@ -2,7 +2,7 @@
 
 **Related Projects:** [Strong Triplet Loss Baseline](https://github.com/huanghoujing/person-reid-triplet-loss-baseline)
 
-This project implements PCB (Part-based Convolutional Baseline) of paper [Beyond Part Models: Person Retrieval with Refined Part Pooling](https://arxiv.org/abs/1711.09349) using [pytorch](https://github.com/pytorch/pytorch).
+This project implements PCB (Part-based Convolutional Baseline) of paper [Beyond Part Models: Person Retrieval with Refined Part Pooling](https://arxiv.org/abs/1711.09349) using [pytorch](https://github.com/pytorch/pytorch). And current version is forked from huanghoujing [huanghoujing/beyond-part-models](https://github.com/huanghoujing/beyond-part-models)
 
 
 # Current Results
@@ -26,6 +26,10 @@ The reproduced PCB is as follows.
 | CUHK03 (Shared 1x1 Conv)          | 47.29 | 42.05 | 56.50 | 57.91 |
 | CUHK03 (Independent 1x1 Conv)     | 59.14 | 53.93 | 69.07 | 70.17 |
 | CUHK03 (Paper)                    | 61.30 | 54.20 | -     | -     |
+| | | | | |
+| RAP2 (Shared 1x1 Conv)            | -     | -     | -     | -     |
+| RAP2 (Independent 1x1 Conv)       | 57.88 | 79.70 | 66.49 | 80.53 |
+| RAP2 (Paper)                      | -     | -     | -     | -     |
 
 We can see that independent 1x1 conv layers for different stripes are critical for the performance. The performance on CUHK03 is still worse than the paper, while those on Market1501 and Duke are better.
 
@@ -36,6 +40,7 @@ This repository contains following resources
 
 - A beginner-level dataset interface independent of Pytorch, Tensorflow, etc, supporting multi-thread prefetching (README file is under way)
 - Three most used ReID datasets, Market1501, CUHK03 (new protocol) and DukeMTMC-reID
+- A Richly Annotated Pedestrian (RAP verson2) Dataset for Person Retrieval
 - Python version ReID evaluation code (Originally from [open-reid](https://github.com/Cysu/open-reid))
 - Python version Re-ranking (Originally from [re_ranking](https://github.com/zhunzhong07/person-re-ranking/blob/master/python-version/re_ranking))
 - PCB (Part-based Convolutional Baseline, performance stays tuned)
@@ -54,7 +59,7 @@ pip install -r requirements.txt
 Then clone the repository:
 
 ```bash
-git clone https://github.com/huanghoujing/beyond-part-models.git
+git clone https://github.com/dli2016/beyond-part-models.git
 cd beyond-part-models
 ```
 
@@ -131,6 +136,14 @@ python script/dataset/transform_duke.py \
 ```
 
 
+## RAP2
+
+One can apply to use RAP dateset under the steps in this page [RAP](http://rap.idealtest.org/) and send an email to jiajian2018@ia.ac.cn (or follow the page [here](https://github.com/dangweili/RAP)). Then, put the related files to the directory named data/ and run the following script.
+
+```bash
+python script/dataset/transform_rap2.py
+```
+
 ## Combining Trainval Set of Market1501, CUHK03, DukeMTMC-reID
 
 Larger training set tends to benefit deep learning models, so I combine trainval set of three datasets Market1501, CUHK03 and DukeMTMC-reID. After training on the combined trainval set, the model can be tested on three test sets as usual.
@@ -173,6 +186,10 @@ elif name == 'cuhk03':
 elif name == 'duke':
   im_dir = ospeu('~/Dataset/duke/images')
   partition_file = ospeu('~/Dataset/duke/partitions.pkl')
+
+elif name == 'rap2':
+  im_dir = ospeu('data/rap2/images')
+  partition_file = ospeu('data/rap2/partitions.pkl')
 
 elif name == 'combined':
   assert part in ['trainval'], \
@@ -220,7 +237,7 @@ cmc_configs = {
 My training log and saved model weights (trained with independent 1x1 conv) for three datasets can be downloaded from [Google Drive](https://drive.google.com/drive/folders/1G3mLsI1g8ZZkHyol6d3yHpygZeFsENqO?usp=sharing) or [BaiduYun](https://pan.baidu.com/s/1zfjeiePvr1TlBtu7yGovlQ).
 
 Specify
-- a dataset name (one of `market1501`, `cuhk03`, `duke`)
+- a dataset name (one of `market1501`, `cuhk03`, `duke`, `rap2`)
 - an experiment directory for saving testing log
 - the path of the downloaded `model_weight.pth`
 
@@ -255,21 +272,6 @@ python script/experiment/train_pcb.py \
 --exp_dir EXPERIMENT_DIRECTORY \
 --steps_per_log 20 \
 --epochs_per_val 1
-```
-
-### Log
-
-During training, you can run the [TensorBoard](https://github.com/lanpa/tensorboard-pytorch) and access port `6006` to watch the loss curves etc. E.g.
-
-```bash
-# Modify the path for `--logdir` accordingly.
-tensorboard --logdir YOUR_EXPERIMENT_DIRECTORY/tensorboard
-```
-
-For more usage of TensorBoard, see the website and the help:
-
-```bash
-tensorboard --help
 ```
 
 
@@ -345,3 +347,4 @@ Taking Market1501 as an example
 - [Market1501](http://www.liangzheng.org/Project/project_reid.html)
 - [CUHK03](http://www.ee.cuhk.edu.hk/~xgwang/CUHK_identification.html)
 - [DukeMTMC-reID](https://github.com/layumi/DukeMTMC-reID_evaluation)
+- [RAP](https://github.com/dangweili/RAP)
