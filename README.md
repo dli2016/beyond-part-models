@@ -28,7 +28,7 @@ The reproduced PCB is as follows.
 | CUHK03 (Paper)                    | 61.30 | 54.20 | -     | -     |
 | | | | | |
 | RAP2 (Shared 1x1 Conv)            | -     | -     | -     | -     |
-| RAP2 (Independent 1x1 Conv)       | 57.88 | 79.70 | 66.49 | 80.53 |
+| RAP2 (Independent 1x1 Conv)       | 79.70 | 57.88 | 80.53 | 66.49 |
 | RAP2 (Paper)                      | -     | -     | -     | -     |
 
 We can see that independent 1x1 conv layers for different stripes are critical for the performance. The performance on CUHK03 is still worse than the paper, while those on Market1501 and Duke are better.
